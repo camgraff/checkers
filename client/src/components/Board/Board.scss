@@ -1,0 +1,13 @@
+.board {
+    .row {
+        display: flex;
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: black;
+            &.moveable {
+                background-color: red;
+            }
+        }
+    }
+}
