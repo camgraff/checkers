@@ -4,9 +4,31 @@
         .cell {
             width: 100px;
             height: 100px;
-            background-color: black;
+            background-color: #e4df98;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             &.moveable {
-                background-color: red;
+                background-color: #998347cc;
+            }
+            .piece {
+                height: 80%;
+                width: 80%;
+                border-radius: 50%;
+                border: 1px solid black;
+                cursor: pointer;
+                &.player1 {
+                    background-color: red;
+                }
+                &.player2 {
+                    background-color: white;
+                }
+            }
+            .target-marker {
+                height: 20%;
+                width: 20%;
+                background-color: lightgray;
+                border-radius: 50%;
             }
         }
     }
