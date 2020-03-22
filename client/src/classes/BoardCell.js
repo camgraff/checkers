@@ -6,7 +6,7 @@ export default class BoardCell {
     }
 
     canHavePiece() {
-        return (this.row + this.col) % 2 == 1;
+        return (this.row + this.col) % 2 === 1;
     }
 
     hasPiece() {

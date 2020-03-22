@@ -15,7 +15,13 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('User disconnected');
     });
+    
+    socket.on('move', (cell, piece) => {
+        socket.broadcast.emit('move', cell, piece);
+    })
 });
+
+
 
 app.use(router);
 

@@ -1,10 +1,14 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
+import io from 'socket.io-client';
 
 import BoardCell from "../../classes/BoardCell";
 import BoardPiece from "../../classes/BoardPiece";
 
 import "./Board.scss";
+
+const ENDPOINT = 'http://localhost:5000/';
+
+const socket = io(ENDPOINT);
 
 export default class Board extends React.Component {
     constructor(props) {
@@ -14,7 +18,7 @@ export default class Board extends React.Component {
         for (let i = 0; i < 8; i++) {
             board.push([]);
             for (let j = 0; j < 8; j++) {
-                if ((i + j) % 2 == 1) {
+                if ((i + j) % 2 === 1) {
                     if (i < 3) {
                         board[i].push(new BoardCell(i, j, new BoardPiece(2, i, j)));
                     } else if (i >= 5) {
@@ -31,14 +35,23 @@ export default class Board extends React.Component {
         this.state = {
             board: board,
             targets: [],
-            isMoving: false,
+            pieceToMove: null,
             player: 1
         };
+
+        
     }
 
-    showMoveTargets(row, col) {
+    componentDidMount() {
+        socket.on('move', (cell, piece) => {
+            this.movePiece(piece, cell);
+        });
+    }
+
+    showMoveTargets(piece, row, col) {
         this.setState({
-            targets: this.getMoveTargets(row, col)
+            targets: this.getMoveTargets(row, col),
+            pieceToMove: piece
         })
     }
 
@@ -70,7 +83,7 @@ export default class Board extends React.Component {
         if (!piece.isKing) {
             // Player 1 cannot move down
             // Player 2 cannot move up
-            if ((piece.player === 1 && row > piece.row) || piece.player === 2 && row < piece.row) {
+            if ((piece.player === 1 && row > piece.row) || (piece.player === 2 && row < piece.row)) {
                 return false;
             }
         }
@@ -83,18 +96,45 @@ export default class Board extends React.Component {
         return false;
     }
 
+    handleCellClick(cell) {
+        if (!this.state.targets.includes(cell)) {
+            return;
+        }
+        socket.emit('move', cell, this.state.pieceToMove);
+        this.movePiece(this.state.pieceToMove, cell)
+    }
+
+    movePiece(piece, cell) {
+        let board = this.state.board;
+
+        board[piece.row][piece.col].piece = null;
+        piece.row = cell.row;
+        piece.col = cell.col;
+        board[cell.row][cell.col].piece = piece;
+
+        this.setState({
+            targets: [],
+            pieceToMove: null,
+            board: board
+        });
+    }
+
     render() {
         return (
             <div className="board">
                 {this.state.board.map((row, rowId) => (
                     <div className="row" key={rowId}>
                         {row.map((cell, colId) => (
-                            <div className={`cell ${cell.canHavePiece() ? "moveable" : ""}`} key={colId}>
+                            <div 
+                                className={`cell ${cell.canHavePiece() ? "moveable" : ""}`} 
+                                key={colId}
+                                onClick={() => this.handleCellClick(cell)}
+                            >
                                 {
                                     cell.hasPiece() && 
                                     <div 
                                         className={`piece player${cell.piece.player}`}
-                                        onClick={() => this.showMoveTargets(rowId, colId)}
+                                        onClick={() => this.showMoveTargets(cell.piece, rowId, colId)}
                                     />
                                 }
                                 {
