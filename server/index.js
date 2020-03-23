@@ -60,7 +60,7 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         console.log(socket.id + ' disconnected');
-        if (socketToRoom[socket.id] === null) {
+        if (!roomsMap[socketToRoom[socket.id]]) {
             return;
         }
         if (roomsMap[socketToRoom[socket.id]].player1 === socket.id) {

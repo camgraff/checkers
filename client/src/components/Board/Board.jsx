@@ -8,18 +8,12 @@ import { Icon } from '@iconify/react';
 import chessQueen from '@iconify/icons-mdi/chess-queen';
 import './Board.scss';
 
-const ENDPOINT = 'http://localhost:5000/';
-const socket = io(ENDPOINT);
-
 
 
 //TODO: 
 // Add logic for ending turn in jump chain
 // Add visuals to display whose turn it is
 // Winning/tie conditions
-// Server needs to keep track of current board configuration
-// Fix logic for jump chainging
-
 
 export default class Board extends React.Component {
     constructor(props) {
@@ -53,30 +47,33 @@ export default class Board extends React.Component {
     }
 
     componentDidMount() {
-        socket.on('player-number', (player) => {
+        const ENDPOINT = 'http://localhost:5000/';
+        this.socket = io(ENDPOINT);
+        
+        this.socket.on('player-number', (player) => {
             this.setState({
                 player: player
             });
         });
-        socket.on('move', (cell, piece) => {
+        this.socket.on('move', (cell, piece) => {
             this.movePiece(piece, cell);
         });
 
-        socket.on('endturn', () => {
+        this.socket.on('endturn', () => {
             this.setState({
                 isMyTurn: true
             });
         });
-        socket.on('connection', () => {
-            socket.emit('join-room', this.props.location.pathname);
+        this.socket.on('connection', () => {
+            this.socket.emit('join-room', this.props.location.pathname);
         });
-        socket.on('boardConfig', (board) => {
+        this.socket.on('boardConfig', (board) => {
             let newBoard = this.createBoardFromObject(board);
             this.setState({
                 board: newBoard
             });
         });
-        socket.on('err', (error) => {
+        this.socket.on('err', (error) => {
             console.log(error);
         });
     }
@@ -165,7 +162,7 @@ export default class Board extends React.Component {
         if (!this.state.targets.includes(cell)) {
             return;
         }
-        socket.emit('move', cell, this.state.pieceToMove);
+        this.socket.emit('move', cell, this.state.pieceToMove);
         if (!this.movePiece(this.state.pieceToMove, cell)) {
             this.endTurn();
         }
@@ -204,7 +201,7 @@ export default class Board extends React.Component {
             inJumpChain: false
         });
 
-        socket.emit('boardConfig', board);
+        this.socket.emit('boardConfig', board);
 
         if (isJump) {
             //Check if another piece can be jumped
@@ -231,7 +228,7 @@ export default class Board extends React.Component {
     }
 
     endTurn() {
-        socket.emit('endturn');
+        this.socket.emit('endturn');
         this.setState({
             isMyTurn: false
         });
