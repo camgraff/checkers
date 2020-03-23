@@ -37,21 +37,43 @@ export default class Board extends React.Component {
             board: board,
             targets: [],
             pieceToMove: null,
-            player: 1
+            player: null,
+            isMyTurn: false,
+            inJumpChain: false
         };
     }
 
     componentDidMount() {
+        socket.on('player-number', (player) => {
+            if (player === 1) {
+                this.setState({
+                    isMyTurn: true
+                });
+            }
+            this.setState({
+                player: player
+            });
+        });
         socket.on('move', (cell, piece) => {
             this.movePiece(piece, cell);
         });
+
+        socket.on('endturn', () => {
+            console.log('my turn');
+            this.setState({
+                isMyTurn: true
+            });
+        });
     }
 
-    showMoveTargets(piece, row, col) {
-        this.setState({
-            targets: this.getMoveTargets(row, col),
-            pieceToMove: piece
-        });
+    showMoveTargets(piece) {
+        if (this.state.isMyTurn && !this.state.inJumpChain && piece.player === this.state.player) {
+            this.setState({
+                targets: this.getMoveTargets(piece.row, piece.col),
+                pieceToMove: piece
+            });  
+        }
+        
     }
 
     // Returns an array of coordinates of valid move targets
@@ -116,12 +138,13 @@ export default class Board extends React.Component {
             return;
         }
         socket.emit('move', cell, this.state.pieceToMove);
-        this.movePiece(this.state.pieceToMove, cell);
+        if (!this.movePiece(this.state.pieceToMove, cell)) {
+            this.endTurn();
+        }
     }
 
     /**
      * Moves a piece on the board.
-     * Returns true if a piece was jumped, and the player can move again, false otherwise.
      *
      * @param BoardPiece piece
      * @param BoardCell cell
@@ -129,14 +152,14 @@ export default class Board extends React.Component {
      */
     movePiece(piece, cell) {
         let board = this.state.board;
-        let canMoveAgain = false;
+        let isJump = false;
 
         // Handle the case where we are jumping a piece
         if (Math.abs(piece.row - cell.row) === 2) {
             const jumpRow = (piece.row + cell.row) / 2;
             const jumpCol = (piece.col + cell.col) / 2;
             board[jumpRow][jumpCol].piece = null;
-            canMoveAgain = true;
+            isJump = true;
         }
 
         board[piece.row][piece.col].piece = null;
@@ -146,23 +169,35 @@ export default class Board extends React.Component {
             piece.isKing = true;
         }
         board[cell.row][cell.col].piece = piece;
+        this.setState({
+            targets: [],
+            pieceToMove: null,
+            board: board,
+            inJumpChain: false
+        });
 
-        if (canMoveAgain) {
+        if (isJump) {
             //Check if another piece can be jumped
             this.getPossibleTargets(piece).forEach(adj => {
                 if (adj.hasPiece() && this.canJumpOver(piece, adj.piece)) {
-                    console.log('move again');
+                    this.showMoveTargets(piece);
+                    this.setState({
+                        inJumpChain: true,
+                        pieceToJump: piece
+                    });
+                    return true;
                 }
             });
         }
 
-        this.setState({
-            targets: [],
-            pieceToMove: null,
-            board: board
-        });
+        return false;
+    }
 
-        return canMoveAgain;
+    endTurn() {
+        socket.emit('endturn');
+        this.setState({
+            isMyTurn: false
+        });
     }
 
     /**
