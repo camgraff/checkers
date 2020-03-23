@@ -12,6 +12,13 @@ const ENDPOINT = 'http://localhost:5000/';
 
 const socket = io(ENDPOINT);
 
+//TODO: 
+// Add logic for ending turn in jump chain
+// Add visuals to display whose turn it is
+// Winning/tie conditions
+// Server needs to keep track of current board configuration
+
+
 export default class Board extends React.Component {
     constructor(props) {
         super(props);
@@ -45,11 +52,6 @@ export default class Board extends React.Component {
 
     componentDidMount() {
         socket.on('player-number', (player) => {
-            if (player === 1) {
-                this.setState({
-                    isMyTurn: true
-                });
-            }
             this.setState({
                 player: player
             });
@@ -59,11 +61,33 @@ export default class Board extends React.Component {
         });
 
         socket.on('endturn', () => {
-            console.log('my turn');
             this.setState({
                 isMyTurn: true
             });
         });
+        socket.on('connection', () => {
+            socket.emit('boardConfig', this.state.board);
+        });
+        socket.on('boardConfig', (board) => {
+            let newBoard = this.createBoardFromObject(board);
+            this.setState({
+                board: newBoard
+            });
+        });
+    }
+
+    // Creates a new board from the object passed in from the server
+    createBoardFromObject(board) {
+        board.forEach((row, r) => {
+            row.forEach((cell, c) => {
+                let piece = board[r][c].piece;
+                if (piece !== null) {
+                    piece = new BoardPiece(piece.player, piece.row, piece.col, piece.isKing);
+                }
+                board[r][c] = new BoardCell(r, c, piece);
+            });
+        });
+        return board;
     }
 
     showMoveTargets(piece) {
@@ -73,10 +97,9 @@ export default class Board extends React.Component {
                 pieceToMove: piece
             });  
         }
-        
     }
 
-    // Returns an array of coordinates of valid move targets
+    // Returns an array of cells
     getMoveTargets(row, col) {
         const board = this.state.board;
         const piece = board[row][col].piece;
@@ -175,6 +198,8 @@ export default class Board extends React.Component {
             board: board,
             inJumpChain: false
         });
+
+        socket.emit('boardConfig', board);
 
         if (isJump) {
             //Check if another piece can be jumped
