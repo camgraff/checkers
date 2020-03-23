@@ -47,7 +47,7 @@ export default class Board extends React.Component {
     }
 
     componentDidMount() {
-        const ENDPOINT = 'http://localhost:5000/';
+        const ENDPOINT = 'https://simple-checkers.herokuapp.com/';
         this.socket = io(ENDPOINT);
         
         this.socket.on('player-number', (player) => {
