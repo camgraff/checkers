@@ -9,14 +9,16 @@ import chessQueen from '@iconify/icons-mdi/chess-queen';
 import './Board.scss';
 
 const ENDPOINT = 'http://localhost:5000/';
-
 const socket = io(ENDPOINT);
+
+
 
 //TODO: 
 // Add logic for ending turn in jump chain
 // Add visuals to display whose turn it is
 // Winning/tie conditions
 // Server needs to keep track of current board configuration
+// Fix logic for jump chainging
 
 
 export default class Board extends React.Component {
@@ -66,13 +68,16 @@ export default class Board extends React.Component {
             });
         });
         socket.on('connection', () => {
-            socket.emit('boardConfig', this.state.board);
+            socket.emit('join-room', this.props.location.pathname);
         });
         socket.on('boardConfig', (board) => {
             let newBoard = this.createBoardFromObject(board);
             this.setState({
                 board: newBoard
             });
+        });
+        socket.on('err', (error) => {
+            console.log(error);
         });
     }
 
@@ -203,16 +208,23 @@ export default class Board extends React.Component {
 
         if (isJump) {
             //Check if another piece can be jumped
+            let targets = [];
             this.getPossibleTargets(piece).forEach(adj => {
-                if (adj.hasPiece() && this.canJumpOver(piece, adj.piece)) {
-                    this.showMoveTargets(piece);
-                    this.setState({
-                        inJumpChain: true,
-                        pieceToJump: piece
-                    });
-                    return true;
+                if (adj.hasPiece()) {
+                    let target = this.canJumpOver(piece, adj.piece);
+                    if (target) {
+                        targets.push(target);
+                    }
                 }
             });
+            if (targets.length > 0) {
+                this.setState({
+                    inJumpChain: true,
+                    pieceToMove: piece,
+                    targets: targets
+                });
+                return true;
+            }
         }
 
         return false;
