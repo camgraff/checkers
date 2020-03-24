@@ -1,9 +1,13 @@
 .board {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     .row {
         display: flex;
         .cell {
-            width: 100px;
-            height: 100px;
+            width: 80px;
+            height: 80px;
             background-color: #e4df98;
             display: flex;
             justify-content: center;
