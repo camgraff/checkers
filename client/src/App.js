@@ -7,7 +7,7 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 const App = () => {
     return (
-        <Router basename="/">
+        <Router basename="/checkers">
             <Route path='/' exact component={GameGenerator} />
             <Route path='/game/:id' exact component={Board} />
         </Router>
