@@ -14,6 +14,8 @@ import './Board.scss';
 // Add logic for ending turn in jump chain
 // Add visuals to display whose turn it is
 // Winning/tie conditions
+// Add error handling for if a user joins a game that is full
+// Fix bug with jump chaining showing up on both players screens
 
 export default class Board extends React.Component {
     constructor(props) {
@@ -184,7 +186,9 @@ export default class Board extends React.Component {
             const jumpRow = (piece.row + cell.row) / 2;
             const jumpCol = (piece.col + cell.col) / 2;
             board[jumpRow][jumpCol].piece = null;
-            isJump = true;
+            if (piece.player === this.state.player) {
+                isJump = true;
+            }
         }
 
         board[piece.row][piece.col].piece = null;
