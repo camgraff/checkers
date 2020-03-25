@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import io from 'socket.io-client';
 
 import BoardCell from '../../classes/BoardCell';
@@ -16,8 +17,14 @@ import './Board.scss';
 // Winning/tie conditions
 // Add error handling for if a user joins a game that is full
 // Fix bug with jump chaining showing up on both players screens
+// Add dragging for pieces
 
 export default class Board extends React.Component {
+    static get propTypes() {
+        return {
+            location: PropTypes.any
+        };
+    }
     constructor(props) {
         super(props);
 
@@ -49,7 +56,7 @@ export default class Board extends React.Component {
     }
 
     componentDidMount() {
-        const ENDPOINT = 'https://simple-checkers.herokuapp.com/';
+        const ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
         this.socket = io(ENDPOINT);
         
         this.socket.on('player-number', (player) => {
