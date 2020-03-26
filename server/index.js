@@ -22,6 +22,7 @@ io.on('connection', (socket) => {
 
     socket.on('join-room', (room,) => {
         socket.join(room);
+
         // Initialize room
         if (io.sockets.adapter.rooms[room].length === 1) {
             roomsMap[room] = {
@@ -31,6 +32,11 @@ io.on('connection', (socket) => {
                 turn: 1
             };
         }
+
+        if (io.sockets.adapter.rooms[room].length === 2) {
+            io.in(room).emit('has-both-players', true);
+        }
+
         // Make sure the game is not already full
         if (io.sockets.adapter.rooms[room].length > 2) {
             socket.leave(room);
@@ -63,6 +69,8 @@ io.on('connection', (socket) => {
         if (!roomsMap[socketToRoom[socket.id]]) {
             return;
         }
+        console.log(roomsMap[socketToRoom[socket.id]]);
+        io.in(socketToRoom[socket.id]).emit('has-both-players', false);
         if (roomsMap[socketToRoom[socket.id]].player1 === socket.id) {
             roomsMap[socketToRoom[socket.id]].player1 = null;
         } else if (roomsMap[socketToRoom[socket.id]].player2 === socket.id){

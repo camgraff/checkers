@@ -4,6 +4,7 @@ import io from 'socket.io-client';
 
 import BoardCell from '../../classes/BoardCell';
 import BoardPiece from '../../classes/BoardPiece';
+import InvitePlayer from "../InvitePlayer/InvitePlayer";
 
 import { Icon } from '@iconify/react';
 import chessQueen from '@iconify/icons-mdi/chess-queen';
@@ -16,8 +17,9 @@ import './Board.scss';
 // Add visuals to display whose turn it is
 // Winning/tie conditions
 // Add error handling for if a user joins a game that is full
-// Fix bug with jump chaining showing up on both players screens
 // Add dragging for pieces
+// Make API secure
+// Add initial loading state while waiting for other player to connect
 
 export default class Board extends React.Component {
     static get propTypes() {
@@ -51,7 +53,8 @@ export default class Board extends React.Component {
             pieceToMove: null,
             player: null,
             isMyTurn: false,
-            inJumpChain: false
+            inJumpChain: false,
+            hasBothPlayers: false
         };
     }
 
@@ -63,6 +66,10 @@ export default class Board extends React.Component {
             this.setState({
                 player: player
             });
+        });
+        this.socket.on('has-both-players', (val) => {
+            console.log(val);
+            this.setState({hasBothPlayers: val});
         });
         this.socket.on('move', (cell, piece) => {
             this.movePiece(piece, cell);
@@ -277,6 +284,7 @@ export default class Board extends React.Component {
     render() {
         return (
             <div className='board'>
+                {!this.state.hasBothPlayers && <InvitePlayer />} 
                 {this.state.board.map((row, rowId) => (
                     <div className='row' key={rowId}>
                         {row.map((cell, colId) => (
