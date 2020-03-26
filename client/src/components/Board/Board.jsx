@@ -19,7 +19,6 @@ import './Board.scss';
 // Add error handling for if a user joins a game that is full
 // Add dragging for pieces
 // Make API secure
-// Add initial loading state while waiting for other player to connect
 
 export default class Board extends React.Component {
     static get propTypes() {
