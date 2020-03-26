@@ -1,4 +1,9 @@
 .gameGenerator {
+    height: 100%;
+    display: flex;
+    background-color: lightgray;
+    justify-content: center;
+    align-items: center;
     button {
         font-family: sans-serif;
         background: cornflowerblue;

@@ -69,7 +69,6 @@ io.on('connection', (socket) => {
         if (!roomsMap[socketToRoom[socket.id]]) {
             return;
         }
-        console.log(roomsMap[socketToRoom[socket.id]]);
         io.in(socketToRoom[socket.id]).emit('has-both-players', false);
         if (roomsMap[socketToRoom[socket.id]].player1 === socket.id) {
             roomsMap[socketToRoom[socket.id]].player1 = null;

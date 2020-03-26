@@ -26,7 +26,7 @@ export default class GameGenerator extends React.Component {
     render() {
         return (
             <div className="gameGenerator">
-                <button onClick={() => this.createGame()}>Create Game</button>
+                <button onClick={() => this.createGame()}>Click to start a game!</button>
             </div>
         );
     }
