@@ -1,5 +1,5 @@
 import React from 'react';
-
+import Button from 'react-bootstrap/Button';
 import "./GameGenerator.scss";
 
 
@@ -19,14 +19,14 @@ export default class GameGenerator extends React.Component {
             gameURL: url
         });
 
-        window.open("/game/" + url, "_blank");
+        window.open(window.location.href + "/game/" + url, "_self");
     }
 
 
     render() {
         return (
             <div className="gameGenerator">
-                <button onClick={() => this.createGame()}>Click to start a game!</button>
+                <Button onClick={() => this.createGame()}>Click to start a game!</Button> 
             </div>
         );
     }
