@@ -19,7 +19,7 @@ export default class GameGenerator extends React.Component {
             gameURL: url
         });
 
-        window.open(window.location.href + "/game/" + url, "_self");
+        window.open(window.location.href + "game/" + url, "_self");
     }
 
 
