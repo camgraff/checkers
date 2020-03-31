@@ -59,6 +59,7 @@ export default class Board extends React.Component {
 
     componentDidMount() {
         const ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
+        console.log(ENDPOINT);
         this.socket = io(ENDPOINT);
         
         this.socket.on('player-number', (player) => {
