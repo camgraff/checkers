@@ -10,7 +10,7 @@ import './App.scss';
 
 const App = () => {
     return (
-        <Router basename={process.env.PUBLIC_URL}>
+        <Router basename={process.env.REACT_APP_BASE_URL}>
             <Route path='/' exact component={GameGenerator} />
             <Route path='/game/:id' exact component={Board} />
             <Route path='/test' exact component={InvitePlayer} />

@@ -34,7 +34,7 @@ class InvitePlayer extends React.Component {
                         <InputGroup>
                             <FormControl
                                 id="url"
-                                value={process.env.REACT_APP_BASE_URL + this.props.location.pathname}
+                                value={window.location}
                                 readOnly
                             />
                             <InputGroup.Append id="copy-btn" onClick={this.copyToClipboard}>
