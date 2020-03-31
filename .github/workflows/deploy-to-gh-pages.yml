@@ -27,6 +27,7 @@ jobs:
         npm run-script build
       env:
         REACT_APP_API_ENDPOINT: ${{ secrets.REACT_APP_API_ENDPOINT }}
+        REACT_APP_BASE_URL: ${{ secrets.REACT_APP_BASE_URL }}
 
     # Runs a set of commands using the runners shell
     - name: Deploy
