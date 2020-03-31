@@ -25,6 +25,8 @@ jobs:
         cd client
         npm install
         npm run-script build
+      env:
+        REACT_APP_API_ENDPOINT: ${{ secrets.REACT_APP_API_ENDPOINT }}
 
     # Runs a set of commands using the runners shell
     - name: Deploy
