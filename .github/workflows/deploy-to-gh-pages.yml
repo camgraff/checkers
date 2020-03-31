@@ -22,6 +22,7 @@ jobs:
 
     - name: Build
       run: |
+        cd client
         npm install
         npm run-script build
 
