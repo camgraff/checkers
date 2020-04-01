@@ -5,6 +5,9 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    &.player2 {
+       transform: rotate(180deg); 
+    }
     .row {
         display: flex;
         max-width: 700px;

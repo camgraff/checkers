@@ -283,7 +283,7 @@ export default class Board extends React.Component {
 
     render() {
         return (
-            <div className='board'>
+            <div className={`board ${this.state.player === 2 ? 'player2' : ''}`}>
                 {!this.state.hasBothPlayers && <InvitePlayer />} 
                 {this.state.board.map((row, rowId) => (
                     <div className='row' key={rowId}>
