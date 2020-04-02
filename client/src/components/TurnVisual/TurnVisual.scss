@@ -1,0 +1,26 @@
+.turnContainer {
+    .turns {
+        margin-top: 2rem;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        h1 {
+            background-color: lightblue;
+            border: 1px solid black;
+            padding: 2rem;
+            border-radius: 5px;
+            font-size: 24px;
+            position: relative;
+            margin: 0;
+            .active {
+                position: absolute;
+                left: 0.5rem;
+                top: 45%;
+                background-color: green;
+                height: 1rem;
+                width: 1rem;
+                border-radius: 50%;
+            }
+        }
+    }
+}

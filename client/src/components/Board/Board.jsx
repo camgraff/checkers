@@ -4,15 +4,14 @@ import io from 'socket.io-client';
 
 import BoardCell from '../../classes/BoardCell';
 import BoardPiece from '../../classes/BoardPiece';
-import InvitePlayer from "../InvitePlayer/InvitePlayer";
+import InvitePlayer from '../InvitePlayer/InvitePlayer';
+import TurnVisual from '../TurnVisual/TurnVisual';
 
 import { Icon } from '@iconify/react';
 import chessQueen from '@iconify/icons-mdi/chess-queen';
 import './Board.scss';
 
-
-
-//TODO: 
+//TODO:
 // Add logic for ending turn in jump chain
 // Add visuals to display whose turn it is
 // Winning/tie conditions
@@ -59,17 +58,15 @@ export default class Board extends React.Component {
 
     componentDidMount() {
         const ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
-        console.log(ENDPOINT);
         this.socket = io(ENDPOINT);
-        
-        this.socket.on('player-number', (player) => {
+
+        this.socket.on('player-number', player => {
             this.setState({
                 player: player
             });
         });
-        this.socket.on('has-both-players', (val) => {
-            console.log(val);
-            this.setState({hasBothPlayers: val});
+        this.socket.on('has-both-players', val => {
+            this.setState({ hasBothPlayers: val });
         });
         this.socket.on('move', (cell, piece) => {
             this.movePiece(piece, cell);
@@ -83,13 +80,13 @@ export default class Board extends React.Component {
         this.socket.on('connection', () => {
             this.socket.emit('join-room', this.props.location.pathname);
         });
-        this.socket.on('boardConfig', (board) => {
+        this.socket.on('boardConfig', board => {
             let newBoard = this.createBoardFromObject(board);
             this.setState({
                 board: newBoard
             });
         });
-        this.socket.on('err', (error) => {
+        this.socket.on('err', error => {
             console.log(error);
         });
     }
@@ -113,7 +110,7 @@ export default class Board extends React.Component {
             this.setState({
                 targets: this.getMoveTargets(piece.row, piece.col),
                 pieceToMove: piece
-            });  
+            });
         }
     }
 
@@ -283,29 +280,32 @@ export default class Board extends React.Component {
 
     render() {
         return (
-            <div className={`board ${this.state.player === 2 ? 'player2' : ''}`}>
-                {!this.state.hasBothPlayers && <InvitePlayer />} 
-                {this.state.board.map((row, rowId) => (
-                    <div className='row' key={rowId}>
-                        {row.map((cell, colId) => (
-                            <div
-                                className={`cell ${cell.canHavePiece() ? 'moveable' : ''}`}
-                                key={colId}
-                                onClick={() => this.handleCellClick(cell)}
-                            >
-                                {cell.hasPiece() && (
-                                    <div
-                                        className={`piece player${cell.piece.player}`}
-                                        onClick={() => this.showMoveTargets(cell.piece, rowId, colId)}
-                                    >
-                                        {cell.piece.isKing && <Icon icon={chessQueen} className='king' />}
-                                    </div>
-                                )}
-                                {this.state.targets.includes(cell) && <div className='target-marker'></div>}
-                            </div>
-                        ))}
-                    </div>
-                ))}
+            <div className='game'>
+                <div className={`board ${this.state.player === 2 ? 'player2' : ''}`}>
+                    {!this.state.hasBothPlayers && <InvitePlayer />}
+                    {this.state.board.map((row, rowId) => (
+                        <div className='row' key={rowId}>
+                            {row.map((cell, colId) => (
+                                <div
+                                    className={`cell ${cell.canHavePiece() ? 'moveable' : ''}`}
+                                    key={colId}
+                                    onClick={() => this.handleCellClick(cell)}
+                                >
+                                    {cell.hasPiece() && (
+                                        <div
+                                            className={`piece player${cell.piece.player}`}
+                                            onClick={() => this.showMoveTargets(cell.piece, rowId, colId)}
+                                        >
+                                            {cell.piece.isKing && <Icon icon={chessQueen} className='king' />}
+                                        </div>
+                                    )}
+                                    {this.state.targets.includes(cell) && <div className='target-marker'></div>}
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+                <TurnVisual whoseTurn={this.state.isMyTurn ? this.state.player : (this.state.player === 1 ? 2 : 1)}/>
             </div>
         );
     }
